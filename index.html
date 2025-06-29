@@ -2,23 +2,201 @@
 <html>
 <head>
     <title>社内報フィードバック掲示板</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .post { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
-        .post-form { margin-bottom: 30px; }
-        textarea { width: 100%; height: 100px; margin-bottom: 10px; }
-        button { padding: 8px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-        .like-button { background: #f0f0f0; color: #333; padding: 5px 10px; margin-top: 10px; }
-        .replies { margin-left: 20px; margin-top: 10px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .post { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .post-form { 
+            margin-bottom: 30px; 
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        textarea { 
+            width: 100%; 
+            height: 100px; 
+            margin-bottom: 10px; 
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button { 
+            padding: 8px 15px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .like-button { 
+            background: #f0f0f0; 
+            color: #333; 
+            padding: 5px 10px; 
+            margin-top: 10px; 
+        }
+        .replies { 
+            margin-left: 20px; 
+            margin-top: 10px; 
+        }
+        .reply {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .format-buttons {
+            margin-bottom: 10px;
+        }
+        .format-buttons button {
+            background-color: #f0f0f0;
+            color: #333;
+            margin-right: 5px;
+        }
+        .emoji-picker {
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .emoji-picker span {
+            font-size: 20px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        .emoji-picker span:hover {
+            transform: scale(1.2);
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .post-author {
+            font-weight: bold;
+        }
+        .post-actions {
+            display: flex;
+        }
+        .post-actions button {
+            padding: 3px 8px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .admin-panel {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .hidden {
+            display: none;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .italic {
+            font-style: italic;
+        }
+        .underline {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <h1>社内報フィードバック掲示板</h1>
+    <div class="header">
+        <h1>社内報フィードバック掲示板</h1>
+    </div>
+    
+    <div class="admin-panel hidden" id="admin-panel">
+        <h3>管理者パネル</h3>
+        <p>管理者としてログインしています。すべての投稿を編集・削除できます。</p>
+        <button onclick="logoutAdmin()">管理者ログアウト</button>
+    </div>
     
     <div class="post-form">
         <h2>新規投稿</h2>
+        <input type="text" id="author-name" placeholder="ニックネーム（任意）">
+        <div class="format-buttons">
+            <button onclick="formatText('bold')"><b>B</b></button>
+            <button onclick="formatText('italic')"><i>I</i></button>
+            <button onclick="formatText('underline')<u>U</u></button>
+        </div>
+        <div class="emoji-picker">
+            <span onclick="addEmoji('😊')">😊</span>
+            <span onclick="addEmoji('👍')">👍</span>
+            <span onclick="addEmoji('🎉')">🎉</span>
+            <span onclick="addEmoji('❤️')">❤️</span>
+            <span onclick="addEmoji('😂')">😂</span>
+            <span onclick="addEmoji('🙌')">🙌</span>
+            <span onclick="addEmoji('👏')">👏</span>
+            <span onclick="addEmoji('🤔')">🤔</span>
+            <span onclick="addEmoji('💡')">💡</span>
+            <span onclick="addEmoji('📝')">📝</span>
+        </div>
         <textarea id="post-content" placeholder="ここに投稿内容を入力してください..."></textarea>
         <button onclick="addPost()">投稿する</button>
+        <button onclick="adminLogin()" style="background-color: #6c757d;">管理者ログイン</button>
+    </div>
+    
+    <div id="edit-form" class="post-form hidden">
+        <h2>投稿を編集</h2>
+        <input type="text" id="edit-author-name" placeholder="ニックネーム（任意）">
+        <div class="format-buttons">
+            <button onclick="formatEditText('bold')"><b>B</b></button>
+            <button onclick="formatEditText('italic')"><i>I</i></button>
+            <button onclick="formatEditText('underline')"><u>U</u></button>
+        </div>
+        <div class="emoji-picker">
+            <span onclick="addEditEmoji('😊')">😊</span>
+            <span onclick="addEditEmoji('👍')">👍</span>
+            <span onclick="addEditEmoji('🎉')">🎉</span>
+            <span onclick="addEditEmoji('❤️')">❤️</span>
+            <span onclick="addEditEmoji('😂')">😂</span>
+            <span onclick="addEditEmoji('🙌')">🙌</span>
+            <span onclick="addEditEmoji('👏')">👏</span>
+            <span onclick="addEditEmoji('🤔')">🤔</span>
+            <span onclick="addEditEmoji('💡')">💡</span>
+            <span onclick="addEditEmoji('📝')">📝</span>
+        </div>
+        <textarea id="edit-content"></textarea>
+        <input type="hidden" id="edit-post-id">
+        <button onclick="updatePost()">更新する</button>
+        <button onclick="cancelEdit()" style="background-color: #6c757d;">キャンセル</button>
     </div>
     
     <div id="posts-container">
@@ -28,27 +206,79 @@
     <script>
         // LocalStorageからデータを読み込む
         let posts = JSON.parse(localStorage.getItem('posts')) || [];
+        let isAdmin = localStorage.getItem('isAdmin') === 'true';
+        
+        // 管理者パネルの表示/非表示
+        updateAdminPanel();
         
         // 画面表示時に投稿を表示
         displayPosts();
         
+        // 管理者ログイン
+        function adminLogin() {
+            const ADMIN_PASSWORD = "admin1234"; // 実際の運用では強力なパスワードに変更してください
+            const password = prompt("管理者パスワードを入力してください");
+            
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                localStorage.setItem('isAdmin', 'true');
+                updateAdminPanel();
+                alert("管理者としてログインしました。すべての投稿を編集・削除できます。");
+            } else if (password !== null) {
+                alert("パスワードが正しくありません。");
+            }
+        }
+        
+        // 管理者ログアウト
+        function logoutAdmin() {
+            isAdmin = false;
+            localStorage.setItem('isAdmin', 'false');
+            updateAdminPanel();
+            alert("管理者からログアウトしました。");
+        }
+        
+        // 管理者パネルの更新
+        function updateAdminPanel() {
+            const adminPanel = document.getElementById('admin-panel');
+            if (isAdmin) {
+                adminPanel.classList.remove('hidden');
+            } else {
+                adminPanel.classList.add('hidden');
+            }
+        }
+        
         // 新規投稿を追加
         function addPost() {
             const content = document.getElementById('post-content').value;
+            const author = document.getElementById('author-name').value || "匿名";
+            
             if (content.trim() === '') return;
             
             const post = {
                 id: Date.now(),
                 content: content,
+                author: author,
                 likes: 0,
                 replies: [],
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString(),
+                authorId: generateAuthorId() // 投稿者を識別するためのID
             };
             
             posts.unshift(post); // 配列の先頭に追加
             savePosts();
             displayPosts();
             document.getElementById('post-content').value = '';
+            document.getElementById('author-name').value = '';
+        }
+        
+        // 投稿者IDを生成（ブラウザごとに固有のID）
+        function generateAuthorId() {
+            let authorId = localStorage.getItem('authorId');
+            if (!authorId) {
+                authorId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('authorId', authorId);
+            }
+            return authorId;
         }
         
         // いいねを追加
@@ -64,15 +294,81 @@
         // 返信を追加
         function addReply(postId) {
             const replyContent = document.getElementById(`reply-${postId}`).value;
+            const author = document.getElementById(`reply-author-${postId}`).value || "匿名";
+            
             if (replyContent.trim() === '') return;
             
             const post = posts.find(p => p.id === postId);
             if (post) {
                 post.replies.push({
                     content: replyContent,
+                    author: author,
                     timestamp: new Date().toLocaleString()
                 });
                 savePosts();
+                displayPosts();
+            }
+        }
+        
+        // 投稿を削除
+        function deletePost(id) {
+            const post = posts.find(p => p.id === id);
+            const authorId = localStorage.getItem('authorId');
+            
+            // 管理者または投稿者本人のみ削除可能
+            if (isAdmin || (post && post.authorId === authorId)) {
+                if (confirm('本当にこの投稿を削除しますか？')) {
+                    posts = posts.filter(post => post.id !== id);
+                    savePosts();
+                    displayPosts();
+                }
+            } else {
+                alert("この投稿を削除する権限がありません。");
+            }
+        }
+        
+        // 投稿の編集フォームを表示
+        function editPost(id) {
+            const post = posts.find(p => p.id === id);
+            const authorId = localStorage.getItem('authorId');
+            
+            // 管理者または投稿者本人のみ編集可能
+            if (isAdmin || (post && post.authorId === authorId)) {
+                document.getElementById('edit-content').value = post.content;
+                document.getElementById('edit-author-name').value = post.author;
+                document.getElementById('edit-post-id').value = post.id;
+                
+                document.getElementById('edit-form').classList.remove('hidden');
+                document.getElementById('posts-container').classList.add('hidden');
+                document.querySelector('.post-form').classList.add('hidden');
+            } else {
+                alert("この投稿を編集する権限がありません。");
+            }
+        }
+        
+        // 編集をキャンセル
+        function cancelEdit() {
+            document.getElementById('edit-form').classList.add('hidden');
+            document.getElementById('posts-container').classList.remove('hidden');
+            document.querySelector('.post-form').classList.remove('hidden');
+        }
+        
+        // 投稿を更新
+        function updatePost() {
+            const id = parseInt(document.getElementById('edit-post-id').value);
+            const content = document.getElementById('edit-content').value;
+            const author = document.getElementById('edit-author-name').value || "匿名";
+            
+            if (content.trim() === '') return;
+            
+            const post = posts.find(p => p.id === id);
+            if (post) {
+                post.content = content;
+                post.author = author;
+                post.editedAt = new Date().toLocaleString();
+                
+                savePosts();
+                cancelEdit();
                 displayPosts();
             }
         }
@@ -82,16 +378,32 @@
             const container = document.getElementById('posts-container');
             container.innerHTML = '';
             
+            const authorId = localStorage.getItem('authorId');
+            
             posts.forEach(post => {
+                // 投稿者本人または管理者のみ編集・削除ボタンを表示
+                const canModify = isAdmin || post.authorId === authorId;
+                
                 let postHTML = `
                     <div class="post">
+                        <div class="post-header">
+                            <div class="post-author">${post.author}</div>
+                            <div class="post-actions">
+                                ${canModify ? `
+                                    <button onclick="editPost(${post.id})">編集</button>
+                                    <button onclick="deletePost(${post.id})">削除</button>
+                                ` : ''}
+                            </div>
+                        </div>
                         <div>${post.content}</div>
                         <small>${post.timestamp}</small>
+                        ${post.editedAt ? `<small>（編集済み: ${post.editedAt}）</small>` : ''}
                         <button class="like-button" onclick="likePost(${post.id})">👍 ${post.likes}</button>
                         
                         <div class="replies">
                             ${post.replies.map(reply => `
                                 <div class="reply">
+                                    <strong>${reply.author}</strong>
                                     <div>${reply.content}</div>
                                     <small>${reply.timestamp}</small>
                                 </div>
@@ -99,6 +411,7 @@
                         </div>
                         
                         <div class="reply-form">
+                            <input type="text" id="reply-author-${post.id}" placeholder="ニックネーム（任意）">
                             <textarea id="reply-${post.id}" placeholder="返信を入力..."></textarea>
                             <button onclick="addReply(${post.id})">返信する</button>
                         </div>
@@ -112,6 +425,78 @@
         // データを保存
         function savePosts() {
             localStorage.setItem('posts', JSON.stringify(posts));
+        }
+        
+        // テキスト装飾（新規投稿）
+        function formatText(type) {
+            const textarea = document.getElementById('post-content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            let formattedText = '';
+            
+            switch(type) {
+                case 'bold':
+                    formattedText = `<b>${selectedText}</b>`;
+                    break;
+                case 'italic':
+                    formattedText = `<i>${selectedText}</i>`;
+                    break;
+                case 'underline':
+                    formattedText = `<u>${selectedText}</u>`;
+                    break;
+            }
+            
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.focus();
+            textarea.selectionStart = start + formattedText.length;
+            textarea.selectionEnd = start + formattedText.length;
+        }
+        
+        // テキスト装飾（編集フォーム）
+        function formatEditText(type) {
+            const textarea = document.getElementById('edit-content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            let formattedText = '';
+            
+            switch(type) {
+                case 'bold':
+                    formattedText = `<b>${selectedText}</b>`;
+                    break;
+                case 'italic':
+                    formattedText = `<i>${selectedText}</i>`;
+                    break;
+                case 'underline':
+                    formattedText = `<u>${selectedText}</u>`;
+                    break;
+            }
+            
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.focus();
+            textarea.selectionStart = start + formattedText.length;
+            textarea.selectionEnd = start + formattedText.length;
+        }
+        
+        // 絵文字を追加（新規投稿）
+        function addEmoji(emoji) {
+            const textarea = document.getElementById('post-content');
+            const cursorPos = textarea.selectionStart;
+            textarea.value = textarea.value.substring(0, cursorPos) + emoji + textarea.value.substring(cursorPos);
+            textarea.focus();
+            textarea.selectionStart = cursorPos + emoji.length;
+            textarea.selectionEnd = cursorPos + emoji.length;
+        }
+        
+        // 絵文字を追加（編集フォーム）
+        function addEditEmoji(emoji) {
+            const textarea = document.getElementById('edit-content');
+            const cursorPos = textarea.selectionStart;
+            textarea.value = textarea.value.substring(0, cursorPos) + emoji + textarea.value.substring(cursorPos);
+            textarea.focus();
+            textarea.selectionStart = cursorPos + emoji.length;
+            textarea.selectionEnd = cursorPos + emoji.length;
         }
     </script>
 </body>

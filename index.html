@@ -19,6 +19,15 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
+        .notice {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
         .post { 
             border: 1px solid #ddd; 
             padding: 15px; 
@@ -142,6 +151,10 @@
         <h1>社内報フィードバック掲示板</h1>
     </div>
     
+    <div class="notice">
+        <strong>ご注意:</strong> 管理者が不適切と判断したコメントは削除させて頂きます。ご了承ください。
+    </div>
+    
     <div class="admin-panel hidden" id="admin-panel">
         <h3>管理者パネル</h3>
         <p>管理者としてログインしています。すべての投稿を編集・削除できます。</p>
@@ -154,7 +167,7 @@
         <div class="format-buttons">
             <button onclick="formatText('bold')"><b>B</b></button>
             <button onclick="formatText('italic')"><i>I</i></button>
-            <button onclick="formatText('underline')<u>U</u></button>
+            <button onclick="formatText('underline')"><u>U</u></button>
         </div>
         <div class="emoji-picker">
             <span onclick="addEmoji('😊')">😊</span>

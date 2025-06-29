@@ -18,6 +18,24 @@
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 20px;
+            position: relative;
+        }
+        .company-link {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: white;
+            color: #4CAF50;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .company-link:hover {
+            background-color: #f1f1f1;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .notice {
             background-color: #fff3cd;
@@ -192,11 +210,27 @@
             color: white;
             margin-left: 10px;
         }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>社内報フィードバック掲示板</h1>
+        <a href="https://kyotaki.co.jp/" target="_blank" class="company-link">京瀧ウェブページ</a>
     </div>
     
     <div class="notice">
@@ -284,6 +318,10 @@
     
     <div id="posts-container">
         <!-- 投稿がここに表示されます -->
+    </div>
+    
+    <div class="footer">
+        <p>社内報フィードバック掲示板 | <a href="https://kyotaki.co.jp/" target="_blank">京瀧ウェブページ</a></p>
     </div>
 
     <script>

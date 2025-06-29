@@ -144,6 +144,54 @@
         .underline {
             text-decoration: underline;
         }
+        .image-upload {
+            margin-bottom: 10px;
+        }
+        .image-preview {
+            max-width: 100%;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .post-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-button {
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .clear-image {
+            background-color: #dc3545;
+            color: white;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -182,6 +230,17 @@
             <span onclick="addEmoji('📝')">📝</span>
         </div>
         <textarea id="post-content" placeholder="ここに投稿内容を入力してください..."></textarea>
+        
+        <div class="image-upload">
+            <div class="file-input-wrapper">
+                <div class="file-input-button">画像を添付</div>
+                <input type="file" id="image-upload" accept="image/*" onchange="previewImage(this)">
+            </div>
+            <button onclick="clearImage()" class="clear-image hidden" id="clear-image-btn">画像を削除</button>
+            <div class="image-preview" id="image-preview"></div>
+            <input type="hidden" id="image-data">
+        </div>
+        
         <button onclick="addPost()">投稿する</button>
         <button onclick="adminLogin()" style="background-color: #6c757d;">管理者ログイン</button>
     </div>
@@ -207,6 +266,17 @@
             <span onclick="addEditEmoji('📝')">📝</span>
         </div>
         <textarea id="edit-content"></textarea>
+        
+        <div class="image-upload">
+            <div class="file-input-wrapper">
+                <div class="file-input-button">画像を添付</div>
+                <input type="file" id="edit-image-upload" accept="image/*" onchange="previewEditImage(this)">
+            </div>
+            <button onclick="clearEditImage()" class="clear-image hidden" id="edit-clear-image-btn">画像を削除</button>
+            <div class="image-preview" id="edit-image-preview"></div>
+            <input type="hidden" id="edit-image-data">
+        </div>
+        
         <input type="hidden" id="edit-post-id">
         <button onclick="updatePost()">更新する</button>
         <button onclick="cancelEdit()" style="background-color: #6c757d;">キャンセル</button>
@@ -260,17 +330,71 @@
             }
         }
         
+        // 画像プレビュー（新規投稿）
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const clearBtn = document.getElementById('clear-image-btn');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.innerHTML = ``;
+                    document.getElementById('image-data').value = e.target.result;
+                    clearBtn.classList.remove('hidden');
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // 画像プレビュー（編集）
+        function previewEditImage(input) {
+            const preview = document.getElementById('edit-image-preview');
+            const clearBtn = document.getElementById('edit-clear-image-btn');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.innerHTML = ``;
+                    document.getElementById('edit-image-data').value = e.target.result;
+                    clearBtn.classList.remove('hidden');
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // 画像クリア（新規投稿）
+        function clearImage() {
+            document.getElementById('image-preview').innerHTML = '';
+            document.getElementById('image-data').value = '';
+            document.getElementById('image-upload').value = '';
+            document.getElementById('clear-image-btn').classList.add('hidden');
+        }
+        
+        // 画像クリア（編集）
+        function clearEditImage() {
+            document.getElementById('edit-image-preview').innerHTML = '';
+            document.getElementById('edit-image-data').value = '';
+            document.getElementById('edit-image-upload').value = '';
+            document.getElementById('edit-clear-image-btn').classList.add('hidden');
+        }
+        
         // 新規投稿を追加
         function addPost() {
             const content = document.getElementById('post-content').value;
             const author = document.getElementById('author-name').value || "匿名";
+            const imageData = document.getElementById('image-data').value;
             
-            if (content.trim() === '') return;
+            if (content.trim() === '' && !imageData) return;
             
             const post = {
                 id: Date.now(),
                 content: content,
                 author: author,
+                imageData: imageData,
                 likes: 0,
                 replies: [],
                 timestamp: new Date().toLocaleString(),
@@ -282,6 +406,7 @@
             displayPosts();
             document.getElementById('post-content').value = '';
             document.getElementById('author-name').value = '';
+            clearImage();
         }
         
         // 投稿者IDを生成（ブラウザごとに固有のID）
@@ -351,6 +476,17 @@
                 document.getElementById('edit-author-name').value = post.author;
                 document.getElementById('edit-post-id').value = post.id;
                 
+                // 画像があれば表示
+                if (post.imageData) {
+                    document.getElementById('edit-image-preview').innerHTML = ``;
+                    document.getElementById('edit-image-data').value = post.imageData;
+                    document.getElementById('edit-clear-image-btn').classList.remove('hidden');
+                } else {
+                    document.getElementById('edit-image-preview').innerHTML = '';
+                    document.getElementById('edit-image-data').value = '';
+                    document.getElementById('edit-clear-image-btn').classList.add('hidden');
+                }
+                
                 document.getElementById('edit-form').classList.remove('hidden');
                 document.getElementById('posts-container').classList.add('hidden');
                 document.querySelector('.post-form').classList.add('hidden');
@@ -371,13 +507,15 @@
             const id = parseInt(document.getElementById('edit-post-id').value);
             const content = document.getElementById('edit-content').value;
             const author = document.getElementById('edit-author-name').value || "匿名";
+            const imageData = document.getElementById('edit-image-data').value;
             
-            if (content.trim() === '') return;
+            if (content.trim() === '' && !imageData) return;
             
             const post = posts.find(p => p.id === id);
             if (post) {
                 post.content = content;
                 post.author = author;
+                post.imageData = imageData;
                 post.editedAt = new Date().toLocaleString();
                 
                 savePosts();
@@ -409,6 +547,7 @@
                             </div>
                         </div>
                         <div>${post.content}</div>
+                        ${post.imageData ? `` : ''}
                         <small>${post.timestamp}</small>
                         ${post.editedAt ? `<small>（編集済み: ${post.editedAt}）</small>` : ''}
                         <button class="like-button" onclick="likePost(${post.id})">👍 ${post.likes}</button>
@@ -437,7 +576,17 @@
         
         // データを保存
         function savePosts() {
-            localStorage.setItem('posts', JSON.stringify(posts));
+            try {
+                localStorage.setItem('posts', JSON.stringify(posts));
+            } catch (e) {
+                // ストレージ容量超過などのエラー処理
+                if (e.name === 'QuotaExceededError') {
+                    alert('ストレージの容量を超えました。古い投稿を削除するか、画像のサイズを小さくしてください。');
+                    // 古い投稿を自動的に削除する場合はこちらを使用
+                    // posts = posts.slice(0, Math.floor(posts.length / 2));
+                    // savePosts();
+                }
+            }
         }
         
         // テキスト装飾（新規投稿）
